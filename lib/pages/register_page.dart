@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:pokedex_app/main.dart';
+import 'package:pokedex_app/routes.dart';
+import 'package:pokedex_app/services/auth_services.dart';
 import 'package:pokedex_app/themes.dart';
+import 'package:pokedex_app/validators/validators.dart';
 import 'package:pokedex_app/widgets/custom_text_field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -14,8 +17,30 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  final _authService = AuthService();
 
-  void _register() async {}
+  void _register() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final error = await _authService.register(
+      _emailController.text.trim(),
+      _passwordController.text.trim(),
+    );
+
+    if (!mounted) return;
+
+    if (error != null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(error)));
+    } else {
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,72 +51,90 @@ class _RegisterPageState extends State<RegisterPage> {
         child: ValueListenableBuilder<ThemeMode>(
           valueListenable: themeNotifier,
           builder: (context, mode, _) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 40),
-                Icon(
-                  Icons.person_add,
-                  size: 80,
-                  color: mode == ThemeMode.dark
-                      ? AppColors.pokemonWhite
-                      : AppColors.pokemonRed,
-                ),
-                const SizedBox(height: 12),
-                const Text(
-                  'New Trainer',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-                ),
-                const Text(
-                  'Start your journey',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 40),
-                CustomTextField(
-                  controller: _emailController,
-                  labelText: 'Email',
-                ),
-                CustomTextField(
-                  controller: _passwordController,
-                  labelText: 'Password',
-                ),
-                const SizedBox(height: 40),
-                ElevatedButton(onPressed: _register, child: const Text('Register')),
-
-                const SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text("Already have an account? "),
-                    GestureDetector(
-                      onTap: () => Navigator.of(context).pop(),
-                      child: const Text(
-                        'Log In',
-                        style: TextStyle(
-                          color: AppColors.pokemonRed,
-                          fontWeight: FontWeight.bold,
-                          decoration: TextDecoration.underline,
-                          decorationColor: AppColors.pokemonRed,
-                          decorationThickness: 2,
+            return Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 40),
+                  Icon(
+                    Icons.person_add,
+                    size: 80,
+                    color: mode == ThemeMode.dark
+                        ? AppColors.pokemonWhite
+                        : AppColors.pokemonRed,
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'New Trainer',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                  ),
+                  const Text(
+                    'Start your journey',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 40),
+                  CustomTextField(
+                    controller: _emailController,
+                    labelText: 'Email',
+                    validator: Validators.email,
+                  ),
+                  CustomTextField(
+                    controller: _passwordController,
+                    labelText: 'Password',
+                    obscureText: true,
+                    validator: Validators.password,
+                  ),
+                  CustomTextField(
+                    controller: _confirmPasswordController,
+                    labelText: 'Confirm Password',
+                    obscureText: true,
+                    validator: (value) => Validators.confirmPassword(
+                      value,
+                      _passwordController.text,
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                  ElevatedButton(
+                    onPressed: _register,
+                    child: const Text('Register'),
+                  ),
+              
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text("Already have an account? "),
+                      GestureDetector(
+                        onTap: () => Navigator.of(context).pop(),
+                        child: const Text(
+                          'Log In',
+                          style: TextStyle(
+                            color: AppColors.pokemonRed,
+                            fontWeight: FontWeight.bold,
+                            decoration: TextDecoration.underline,
+                            decorationColor: AppColors.pokemonRed,
+                            decorationThickness: 2,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                Switch(
-                  value: themeNotifier.value == ThemeMode.dark,
-                  onChanged: (value) {
-                    themeNotifier.value = value
-                        ? ThemeMode.dark
-                        : ThemeMode.light;
-                    SharedPreferences.getInstance().then(
-                      (prefs) => prefs.setBool('isDark', value),
-                    );
-                  },
-                ),
-              ],
+                    ],
+                  ),
+                  Switch(
+                    value: themeNotifier.value == ThemeMode.dark,
+                    onChanged: (value) {
+                      themeNotifier.value = value
+                          ? ThemeMode.dark
+                          : ThemeMode.light;
+                      SharedPreferences.getInstance().then(
+                        (prefs) => prefs.setBool('isDark', value),
+                      );
+                    },
+                  ),
+                ],
+              ),
             );
           },
         ),

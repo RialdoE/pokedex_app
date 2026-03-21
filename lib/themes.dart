@@ -91,6 +91,10 @@ class AppTheme {
       bodyMedium: TextStyle(color: AppColors.lightTextPrimary),
       titleLarge: TextStyle(color: AppColors.lightTextPrimary, fontWeight: FontWeight.bold),
     ),
+    snackBarTheme: const SnackBarThemeData(
+      backgroundColor: AppColors.pokemonRed,
+      contentTextStyle: TextStyle(color: AppColors.pokemonWhite),
+    ),
   );
 
   static final dark = ThemeData(
@@ -119,7 +123,7 @@ class AppTheme {
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: AppColors.darkBorder,
+      fillColor: AppColors.darkInputFill,
       labelStyle: const TextStyle(color: AppColors.pokemonWhite),
       hintStyle: const TextStyle(color: AppColors.pokemonGrey),
       border: OutlineInputBorder(
@@ -151,6 +155,10 @@ class AppTheme {
       bodyLarge: TextStyle(color: AppColors.darkTextPrimary),
       bodyMedium: TextStyle(color: AppColors.darkTextPrimary),
       titleLarge: TextStyle(color: AppColors.darkTextPrimary, fontWeight: FontWeight.bold),
+    ),
+        snackBarTheme: const SnackBarThemeData(
+      backgroundColor: AppColors.pokemonRed,
+      contentTextStyle: TextStyle(color: AppColors.pokemonWhite),
     ),
   );
 }
