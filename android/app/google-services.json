@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "65014992500",
+    "project_id": "pokedexapp-bf513",
+    "storage_bucket": "pokedexapp-bf513.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:65014992500:android:1485cf0a911f014f088b21",
+        "android_client_info": {
+          "package_name": "com.example.pokedex_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAYN_oIAdXgC8bF_Mhw5joZLNi3b7zUSmI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
