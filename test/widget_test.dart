@@ -1,30 +1,103 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:pokedex_app/main.dart';
+import 'package:pokedex_app/widgets/custom_text_field.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  group('CustomTextField', () {
+    testWidgets('renders label text correctly', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: CustomTextField(
+              controller: TextEditingController(),
+              labelText: 'Email',
+            ),
+          ),
+        ),
+      );
+      expect(find.text('Email'), findsOneWidget);
+    });
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    testWidgets('shows eye icon when obscureText is true', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: CustomTextField(
+              controller: TextEditingController(),
+              labelText: 'password',
+              obscureText: true,
+            ),
+          ),
+        ),
+      );
+      expect(find.byIcon(Icons.visibility_off), findsOneWidget);
+    });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    testWidgets('does not show eye icon when obscureText is false', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: CustomTextField(
+              controller: TextEditingController(),
+              labelText: 'Email',
+              obscureText: false,
+            ),
+          ),
+        ),
+      );
+      expect(find.byIcon(Icons.visibility_off), findsNothing);
+      expect(find.byIcon(Icons.visibility), findsNothing);
+    });
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    testWidgets('toggles password visibility when eye icon is tapped', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: CustomTextField(
+              controller: TextEditingController(),
+              labelText: 'password',
+              obscureText: true,
+            ),
+          ),
+        ),
+      );
+      expect(find.byIcon(Icons.visibility_off), findsOneWidget);
+
+      await tester.tap(find.byIcon(Icons.visibility_off));
+      await tester.pump();
+
+      expect(find.byIcon(Icons.visibility), findsOneWidget);
+    });
+
+    testWidgets('shows validation error when validator fails', (tester) async {
+      final formKey = GlobalKey<FormState>();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Form(
+              key: formKey,
+              child: Column(
+                children: [
+                  CustomTextField(
+                    controller: TextEditingController(),
+                    labelText: 'Email',
+                    validator: (value) => value!.isEmpty ? 'Please enter your email' : null,
+                  ),
+                  ElevatedButton(
+                    onPressed: () => formKey.currentState!.validate(),
+                    child: const Text('Submit'),
+                  )
+                ],
+              ),
+            ),
+          ),
+        )
+      );
+      await tester.tap(find.text('Submit'));
+      await tester.pump();
+
+      expect(find.text('Please enter your email'), findsOneWidget);
+    });
   });
 }

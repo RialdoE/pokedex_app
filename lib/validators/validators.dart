@@ -18,11 +18,4 @@ class Validators {
     if (value != password) return 'Passwords do not match.';
     return null; 
   }
-
-  static String? name(String? value) {
-    if (value == null || value.isEmpty) return 'Please enter your name.';
-    final regex = RegExp(r'^[a-zA-Z\s]{2,}$'); 
-    if (!regex.hasMatch(value)) return 'Name can only contain letters.';
-    return null;
-  }
 }
