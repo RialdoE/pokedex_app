@@ -1,8 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pokedex_app/cubits/favourite/favourite_cubit.dart';
+import 'package:pokedex_app/cubits/favourite/favourite_state.dart';
 import 'package:pokedex_app/cubits/pokemon/pokemon_cubit.dart';
 import 'package:pokedex_app/cubits/pokemon/pokemon_state.dart';
 import 'package:pokedex_app/pages/pokemon_detail_page.dart';
+import 'package:pokedex_app/repositories/favourite_repository.dart';
 import 'package:pokedex_app/repositories/pokemon_repository.dart';
 import 'package:pokedex_app/themes.dart';
 
@@ -11,10 +15,18 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => PokemonCubit(PokemonRepository())
-        ..getPokemon()
-        ..loadAllPokemonNames(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (_) => PokemonCubit(PokemonRepository(), FavouriteRepository())
+            ..getPokemon()
+            ..loadAllPokemonNames(),
+        ),
+        BlocProvider(
+          create: (_) => FavouriteCubit(FavouriteRepository())
+            ..getFavourites(FirebaseAuth.instance.currentUser!.uid),
+        ),
+      ],
       child: const _HomePageContent(),
     );
   }
@@ -30,11 +42,20 @@ class _HomePageContent extends StatefulWidget {
 class _HomePageContentState extends State<_HomePageContent> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
+  bool _showFavourites = false;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+
+    final pokemonCubit = context.read<PokemonCubit>();
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+    context.read<FavouriteCubit>().stream.listen((state) {
+      if(_showFavourites && state is FavouriteLoaded) {
+        pokemonCubit.showFavourites(userId);
+      }
+    });
   }
 
   @override
@@ -69,45 +90,67 @@ class _HomePageContentState extends State<_HomePageContent> {
         children: [
           Padding(
             padding: const EdgeInsets.all(12),
-            child: Autocomplete<String>(
-              optionsBuilder: (TextEditingValue textEditingValue) {
-                return context.read<PokemonCubit>().getSuggestedPokemon(
-                  textEditingValue.text,
-                );
-              },
-              onSelected: (String selection) {
-                _searchController.text = selection;
-                context.read<PokemonCubit>().searchPokemonByName(selection);
-              },
-              fieldViewBuilder: (context, controller, focusnode, onsubmitted) {
-                controller.addListener(() {
-                  _searchController.text = controller.text;
-                });
-                return StatefulBuilder(
-                  builder: (context, setState) {
-                    controller.addListener(() => setState(() {}));
-                    return TextFormField(
-                      controller: controller,
-                      focusNode: focusnode,
-                      decoration: InputDecoration(
-                        labelText: 'Search Pokémon...',
-                        suffixIcon: controller.text.isNotEmpty
-                            ? IconButton(
-                                icon: const Icon(Icons.close),
-                                onPressed: () {
-                                  controller.clear();
-                                  _searchController.clear();
-                                  context
-                                      .read<PokemonCubit>()
-                                      .searchPokemonByName('');
-                                },
-                              )
-                            : null,
-                      ),
-                    );
+            child: Row(
+              children: [
+                Expanded(
+                  child: Autocomplete<String>(
+                    optionsBuilder: (TextEditingValue textEditingValue) {
+                      return context.read<PokemonCubit>().getSuggestedPokemon(
+                        textEditingValue.text,
+                      );
+                    },
+                    onSelected: (String selection) {
+                      _searchController.text = selection;
+                      context.read<PokemonCubit>().searchPokemonByName(selection);
+                    },
+                    fieldViewBuilder: (context, controller, focusnode, onsubmitted) {
+                      controller.addListener(() {
+                        _searchController.text = controller.text;
+                      });
+                      return StatefulBuilder(
+                        builder: (context, setState) {
+                          controller.addListener(() => setState(() {}));
+                          return TextFormField(
+                            controller: controller,
+                            focusNode: focusnode,
+                            decoration: InputDecoration(
+                              labelText: 'Search Pokémon...',
+                              suffixIcon: controller.text.isNotEmpty
+                                  ? IconButton(
+                                      icon: const Icon(Icons.close),
+                                      onPressed: () {
+                                        controller.clear();
+                                        _searchController.clear();
+                                        if(_showFavourites) {
+                                          context.read<PokemonCubit>().showFavourites(FirebaseAuth.instance.currentUser!.uid);
+                                        } else {
+                                          context.read<PokemonCubit>().searchPokemonByName('');
+                                        }
+                                      },
+                                    )
+                                  : null,
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(
+                    _showFavourites ? Icons.favorite : Icons.favorite_border,
+                    color: _showFavourites ? AppColors.pokemonRed : null,
+                  ),
+                  onPressed: () {
+                    setState(() => _showFavourites = !_showFavourites);
+                    if(_showFavourites) {
+                      context.read<PokemonCubit>().showFavourites(FirebaseAuth.instance.currentUser!.uid);
+                    } else {
+                      context.read<PokemonCubit>().resetAndFetch();
+                    }
                   },
-                );
-              },
+                )
+              ],
             ),
           ),
           Expanded(
@@ -146,22 +189,34 @@ class _HomePageContentState extends State<_HomePageContent> {
                           horizontal: 12,
                           vertical: 4,
                         ),
-                        child: ListTile(
-                          onTap: () => Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => PokemonDetailPage(pokemonId: pokemon.id, pokemonName: pokemon.name),
-                            )
-                          ),
-                          leading: Image.network(
-                            pokemon.imageUrl,
-                            width: 50,
-                            height: 50,
-                          ),
-                          title: Text(
-                            pokemon.name[0].toUpperCase() +
-                                pokemon.name.substring(1),
-                            style: const TextStyle(fontWeight: FontWeight.w600),
-                          ),
+                        child: BlocBuilder<FavouriteCubit, FavouriteState>(
+                          builder: (context, state) {
+                            final isFavourite = context.read<FavouriteCubit>().isFavourite(pokemon.id);
+                            return ListTile(
+                            onTap: () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => PokemonDetailPage(pokemonId: pokemon.id, pokemonName: pokemon.name),
+                              )
+                            ),
+                            leading: Image.network(
+                              pokemon.imageUrl,
+                              width: 50,
+                              height: 50,
+                            ),
+                            title: Text(
+                              pokemon.name[0].toUpperCase() +
+                                  pokemon.name.substring(1),
+                              style: const TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                            trailing: IconButton(
+                              icon: Icon(
+                                isFavourite ? Icons.favorite : Icons.favorite_border,
+                                color: isFavourite ? AppColors.pokemonRed : null,
+                              ),
+                              onPressed: () => context.read<FavouriteCubit>().toggleFavourites(FirebaseAuth.instance.currentUser!.uid, pokemon.id),
+                            ),
+                          );
+                          },
                         ),
                       );
                     },

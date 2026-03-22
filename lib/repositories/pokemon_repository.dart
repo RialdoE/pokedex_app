@@ -109,4 +109,20 @@ class PokemonRepository {
       throw Exception('Failed to load Pokémon details');
     }
   }
+
+  Future<List<PokemonModel>> getPokemonByIds(List<int> ids) async {
+    final responses = await Future.wait(
+      ids.map((id) => http.get(Uri.parse('$_baseUrl/pokemon/$id'))),
+    );
+
+    return responses.map((response) {
+      final data = jsonDecode(response.body);
+      final id = data['id'] as int;
+      return PokemonModel(
+        id: id,
+        name: data['name'],
+        imageUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$id.png'
+      );
+    }).toList();
+  }
 }

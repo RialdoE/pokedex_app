@@ -1,7 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pokedex_app/cubits/favourite/favourite_cubit.dart';
+import 'package:pokedex_app/cubits/favourite/favourite_state.dart';
 import 'package:pokedex_app/cubits/pokemon/pokemon_cubit.dart';
 import 'package:pokedex_app/cubits/pokemon/pokemon_state.dart';
+import 'package:pokedex_app/repositories/favourite_repository.dart';
 import 'package:pokedex_app/repositories/pokemon_repository.dart';
 import 'package:pokedex_app/themes.dart';
 
@@ -17,18 +21,30 @@ class PokemonDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) =>
-          PokemonCubit(PokemonRepository())..getPokemonDetail(pokemonId),
-      child: _PokemonDetailContent(pokemonName: pokemonName),
-    );
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (_) => 
+            PokemonCubit(PokemonRepository(), FavouriteRepository())..getPokemonDetail(pokemonId),
+        ),
+        BlocProvider(
+          create: (_) => 
+            FavouriteCubit(FavouriteRepository())..getFavourites(FirebaseAuth.instance.currentUser!.uid),
+        )
+      ],
+      child: _PokemonDetailContent(
+        pokemonId: pokemonId,
+        pokemonName: pokemonName,
+      ),
+    ); 
   }
 }
 
 class _PokemonDetailContent extends StatelessWidget {
+  final int pokemonId;
   final String pokemonName;
 
-  const _PokemonDetailContent({required this.pokemonName});
+  const _PokemonDetailContent({required this.pokemonId, required this.pokemonName});
 
   Widget _buildStatRow(String label, int? value, Color color) {
     return Padding(
@@ -67,6 +83,7 @@ class _PokemonDetailContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -78,6 +95,29 @@ class _PokemonDetailContent extends StatelessWidget {
         ),
         backgroundColor: AppColors.pokemonRed,
         iconTheme: const IconThemeData(color: AppColors.pokemonWhite),
+        actions: [
+          BlocBuilder<FavouriteCubit,FavouriteState>(
+            builder: (context, state) {
+              final isFavourite = context.read<FavouriteCubit>().isFavourite(pokemonId);
+
+              if(state is FavouriteLoading) {
+                return const Padding(
+                  padding: EdgeInsets.all(12),
+                  child: CircularProgressIndicator(
+                    color: AppColors.pokemonWhite,
+                  ),
+                );
+              }
+              return IconButton(
+                icon: Icon(
+                  isFavourite ? Icons.favorite : Icons.favorite_border,
+                  color: AppColors.pokemonWhite,
+                  ),                
+                  onPressed: () => context.read<FavouriteCubit>().toggleFavourites(userId, pokemonId),
+              );
+            },
+            )
+        ],
       ),
       body: BlocBuilder<PokemonCubit, PokemonState>(
         builder: (context, state) {
