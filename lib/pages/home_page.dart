@@ -202,11 +202,19 @@ class _HomePageContentState extends State<_HomePageContent> {
                           builder: (context, state) {
                             final isFavourite = context.read<FavouriteCubit>().isFavourite(pokemon.id);
                             return ListTile(
-                            onTap: () => Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => PokemonDetailPage(pokemonId: pokemon.id, pokemonName: pokemon.name),
-                              )
-                            ),
+                            onTap: () async {
+                              await Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => PokemonDetailPage(
+                                    pokemonId: pokemon.id,
+                                    pokemonName: pokemon.name,
+                                  ),
+                                )
+                              );
+                              if(context.mounted) {
+                                context.read<FavouriteCubit>().getFavourites(FirebaseAuth.instance.currentUser!.uid);
+                              }
+                            },
                             leading: Image.network(
                               pokemon.imageUrl,
                               width: 50,
