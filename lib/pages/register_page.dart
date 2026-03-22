@@ -46,77 +46,80 @@ class _RegisterPageState extends State<RegisterPage> {
       appBar: AppBar(backgroundColor: AppColors.pokemonRed),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
-        child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(height: 40),
-                  Icon(
-                    Icons.person_add,
-                    size: 80,
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? AppColors.pokemonWhite
-                        : AppColors.pokemonRed,
-                  ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    'New Trainer',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-                  ),
-                  const Text(
-                    'Start your journey',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 40),
-                  CustomTextField(
-                    controller: _emailController,
-                    labelText: 'Email',
-                    validator: Validators.email,
-                  ),
-                  CustomTextField(
-                    controller: _passwordController,
-                    labelText: 'Password',
-                    obscureText: true,
-                    validator: Validators.password,
-                  ),
-                  CustomTextField(
-                    controller: _confirmPasswordController,
-                    labelText: 'Confirm Password',
-                    obscureText: true,
-                    validator: (value) => Validators.confirmPassword(
-                      value,
-                      _passwordController.text,
+        child: Form(
+          key: _formKey,
+          child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(height: 40),
+                    Icon(
+                      Icons.person_add,
+                      size: 80,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? AppColors.pokemonWhite
+                          : AppColors.pokemonRed,
                     ),
-                  ),
-                  const SizedBox(height: 40),
-                  ElevatedButton(
-                    onPressed: _register,
-                    child: const Text('Register'),
-                  ),
-              
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text("Already have an account? "),
-                      GestureDetector(
-                        onTap: () => Navigator.of(context).pop(),
-                        child: const Text(
-                          'Log In',
-                          style: TextStyle(
-                            color: AppColors.pokemonRed,
-                            fontWeight: FontWeight.bold,
-                            decoration: TextDecoration.underline,
-                            decorationColor: AppColors.pokemonRed,
-                            decorationThickness: 2,
+                    const SizedBox(height: 12),
+                    const Text(
+                      'New Trainer',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                    ),
+                    const Text(
+                      'Start your journey',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 40),
+                    CustomTextField(
+                      controller: _emailController,
+                      labelText: 'Email',
+                      validator: Validators.email,
+                    ),
+                    CustomTextField(
+                      controller: _passwordController,
+                      labelText: 'Password',
+                      obscureText: true,
+                      validator: Validators.password,
+                    ),
+                    CustomTextField(
+                      controller: _confirmPasswordController,
+                      labelText: 'Confirm Password',
+                      obscureText: true,
+                      validator: (value) => Validators.confirmPassword(
+                        value,
+                        _passwordController.text,
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+                    ElevatedButton(
+                      onPressed: _register,
+                      child: const Text('Register'),
+                    ),
+                
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text("Already have an account? "),
+                        GestureDetector(
+                          onTap: () => Navigator.of(context).pop(),
+                          child: const Text(
+                            'Log In',
+                            style: TextStyle(
+                              color: AppColors.pokemonRed,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline,
+                              decorationColor: AppColors.pokemonRed,
+                              decorationThickness: 2,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                      ],
+                    ),
+                  ],
+                ),
+        ),
       ),
     );
   }

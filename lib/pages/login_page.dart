@@ -45,66 +45,69 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(backgroundColor: AppColors.pokemonRed),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
-        child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(height: 40),
-                  Icon(
-                    Icons.catching_pokemon,
-                    size: 80,
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? AppColors.pokemonWhite
-                        : AppColors.pokemonRed,
-                  ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    'PokéDex',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-                  ),
-                  const Text(
-                    'Welcome back, Trainer!',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 40),
-                  CustomTextField(
-                    controller: _emailController,
-                    labelText: 'Email',
-                    validator: Validators.email,
-                  ),
-                  CustomTextField(
-                    controller: _passwordController,
-                    labelText: 'Password',
-                    obscureText: true,
-                    validator: Validators.password,
-                  ),
-                  const SizedBox(height: 40),
-                  ElevatedButton(onPressed: _login, child: const Text('Log In')),
-              
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text("Don't have an account? "),
-                      GestureDetector(
-                        onTap: () =>
-                            Navigator.of(context).pushNamed(AppRoutes.register),
-                        child: const Text(
-                          'Register',
-                          style: TextStyle(
-                            color: AppColors.pokemonRed,
-                            fontWeight: FontWeight.bold,
-                            decoration: TextDecoration.underline,
-                            decorationColor: AppColors.pokemonRed,
-                            decorationThickness: 2,
+        child: Form(
+          key: _formKey,
+          child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(height: 40),
+                    Icon(
+                      Icons.catching_pokemon,
+                      size: 80,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? AppColors.pokemonWhite
+                          : AppColors.pokemonRed,
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'PokéDex',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                    ),
+                    const Text(
+                      'Welcome back, Trainer!',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 40),
+                    CustomTextField(
+                      controller: _emailController,
+                      labelText: 'Email',
+                      validator: Validators.email,
+                    ),
+                    CustomTextField(
+                      controller: _passwordController,
+                      labelText: 'Password',
+                      obscureText: true,
+                      validator: Validators.password,
+                    ),
+                    const SizedBox(height: 40),
+                    ElevatedButton(onPressed: _login, child: const Text('Log In')),
+                
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text("Don't have an account? "),
+                        GestureDetector(
+                          onTap: () =>
+                              Navigator.of(context).pushNamed(AppRoutes.register),
+                          child: const Text(
+                            'Register',
+                            style: TextStyle(
+                              color: AppColors.pokemonRed,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline,
+                              decorationColor: AppColors.pokemonRed,
+                              decorationThickness: 2,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                      ],
+                    ),
+                  ],
+                ),
+        ),
       ),
     );
   }
