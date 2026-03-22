@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pokedex_app/cubits/pokemon/pokemon_cubit.dart';
 import 'package:pokedex_app/cubits/pokemon/pokemon_state.dart';
+import 'package:pokedex_app/pages/pokemon_detail_page.dart';
 import 'package:pokedex_app/repositories/pokemon_repository.dart';
 import 'package:pokedex_app/themes.dart';
 
@@ -146,7 +147,11 @@ class _HomePageContentState extends State<_HomePageContent> {
                           vertical: 4,
                         ),
                         child: ListTile(
-                          onTap: () {},
+                          onTap: () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => PokemonDetailPage(pokemonId: pokemon.id, pokemonName: pokemon.name),
+                            )
+                          ),
                           leading: Image.network(
                             pokemon.imageUrl,
                             width: 50,

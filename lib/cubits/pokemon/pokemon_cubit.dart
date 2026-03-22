@@ -74,4 +74,14 @@ class PokemonCubit extends Cubit<PokemonState> {
         .take(5)
         .toList();
   }
+
+  Future<void> getPokemonDetail(int id) async {
+    emit(PokemonDetailLoading());
+    try {
+      final pokemon = await _pokemonRepository.getPokemonDetail(id);
+      emit(PokemonDetailLoaded(pokemon));
+    } catch (e) {
+      emit(PokemonDetailError(e.toString()));
+    }
+  }
 }

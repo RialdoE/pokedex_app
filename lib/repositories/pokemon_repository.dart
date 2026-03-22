@@ -65,4 +65,48 @@ class PokemonRepository {
       throw Exception('Failed to load Pokémon names');
     }
   }
+
+  Future<PokemonModel> getPokemonDetail(int id) async {
+    final results = await Future.wait([
+      http.get(Uri.parse('$_baseUrl/pokemon/$id')),
+      http.get(Uri.parse('$_baseUrl/pokemon-species/$id')),
+    ]);
+
+    final pokemonResponse = results[0];
+    final speciesResponse = results[1];
+
+    if(pokemonResponse.statusCode == 200 && speciesResponse.statusCode == 200) {
+      final pokemonData = jsonDecode(pokemonResponse.body);
+      final speciesData = jsonDecode(speciesResponse.body);
+
+      final List flavorEntries = speciesData['flavor_text_entries'];
+      final description = flavorEntries.firstWhere(
+        (e) => e['language']['name'] == 'en',
+        orElse: () => {'flavor_text' : 'No description available'},
+      )['flavor_text'].toString().replaceAll('\n', ' ').replaceAll('\f', ' ');
+
+      final List types = pokemonData['types'];
+      final typeNames = types.map((t) => t['type']['name'] as String).toList();
+
+      final List stats = pokemonData['stats'];
+      int getStat(String name) => 
+        stats.firstWhere((s) => s['stat']['name'] == name)['base_stat'] as int;
+
+        return PokemonModel(
+          id: id,
+          name: pokemonData['name'],
+          imageUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/$id.png',
+          description: description,
+          types: typeNames,
+          hp: getStat('hp'),
+          attack: getStat('attack'),
+          defence: getStat('defense'),
+          speed: getStat('speed'),
+          specialAttack: getStat('special-attack'),
+          specialDefence: getStat('special-defense'),
+        );
+    } else {
+      throw Exception('Failed to load Pokémon details');
+    }
+  }
 }
