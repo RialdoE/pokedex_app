@@ -146,7 +146,9 @@ class _HomePageContentState extends State<_HomePageContent> {
                 IconButton(
                   icon: Icon(
                     _showFavourites ? Icons.favorite : Icons.favorite_border,
-                    color: _showFavourites ? AppColors.pokemonRed : AppColors.pokemonWhite,
+                    color: _showFavourites ? AppColors.pokemonRed : Theme.of(context).brightness == Brightness.dark
+                    ? AppColors.pokemonWhite
+                    : AppColors.pokemonGrey
                   ),
                   onPressed: () {
                     setState(() => _showFavourites = !_showFavourites);
