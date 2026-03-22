@@ -15,7 +15,6 @@ A cross-platform Flutter application that allows users to browse and explore Pok
 | PokéAPI | Pokémon data source |
 | Flutter Bloc / Cubit | State management |
 | SharedPreferences | Persisting theme preference |
-| Equatable | Value equality for state classes |
 
 ---
 
@@ -45,41 +44,6 @@ Cubit (part of the Flutter Bloc library) is used for state management. Each feat
 
 ### Repository Pattern
 All data fetching is handled through repositories. The `PokemonRepository` handles all PokéAPI calls and the `FavouriteRepository` handles all Firestore operations.
-
----
-
-## Project Structure
-```
-lib/
-├── cubits/
-│   ├── favourite/
-│   │   ├── favourite_cubit.dart
-│   │   └── favourite_state.dart
-│   └── pokemon/
-│       ├── pokemon_cubit.dart
-│       └── pokemon_state.dart
-├── models/
-│   └── pokemon_model.dart
-├── pages/
-│   ├── home_page.dart
-│   ├── login_page.dart
-│   ├── register_page.dart
-│   ├── pokemon_detail_page.dart
-│   └── settings_page.dart
-├── repositories/
-│   ├── favourite_repository.dart
-│   └── pokemon_repository.dart
-├── services/
-│   └── auth_services.dart
-├── validators/
-│   └── validators.dart
-├── widgets/
-│   └── custom_text_field.dart
-├── firebase_options.dart
-├── main.dart
-├── routes.dart
-└── themes.dart
-```
 
 ---
 
