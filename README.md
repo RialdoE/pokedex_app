@@ -20,30 +20,21 @@ A cross-platform Flutter application that allows users to browse and explore Pok
 
 ## Features
 
-- 🔐 Email/password authentication (register and login)
-- 📋 Paginated list of all Pokémon fetched from PokéAPI
-- 🔍 Search Pokémon by name with autocomplete suggestions
-- 📖 Detail page showing full image, description, stats and types
-- ❤️ Favourite Pokémon from home or detail page, stored per user in Firestore
-- 🔥 Filter home page to show only favourited Pokémon
-- 🌙 Light and dark mode with persistent preference
-- ✅ Unit and widget tests
+- Email/password authentication (register and login)
+- Paginated list of all Pokémon fetched from PokéAPI
+- Search Pokémon by name with autocomplete suggestions
+- Detail page showing full image, description, stats and types
+- Favourite Pokémon from home or detail page, stored per user in Firestore
+- Filter home page to show only favourited Pokémon
+- Light and dark mode with persistent preference
+- Unit and widget tests
 
 ---
 
 ## Architecture
 
-The app follows a clean architecture pattern with clear separation between layers:
-
-- **UI Layer** — Flutter pages and widgets
-- **Business Logic Layer** — Cubits (`PokemonCubit`, `FavouriteCubit`)
-- **Data Layer** — Repositories (`PokemonRepository`, `FavouriteRepository`)
-
-### State Management
-Cubit (part of the Flutter Bloc library) is used for state management. Each feature has its own cubit and state file keeping the code modular and maintainable.
-
-### Repository Pattern
-All data fetching is handled through repositories. The `PokemonRepository` handles all PokéAPI calls and the `FavouriteRepository` handles all Firestore operations.
+I used the Bloc/Cubit pattern with repositories to separate the UI, business logic and data layers.
+The PokemonRepository handles the API calls from PokéAPI and the FavouriteRepository handles connection to the database.
 
 ---
 
@@ -54,7 +45,7 @@ All data fetching is handled through repositories. The `PokemonRepository` handl
 - Android Studio or Xcode installed
 - A connected device or emulator
 
-### Installation
+### How to run
 ```bash
 # Clone the repository
 git clone https://github.com/RialdoE/pokedex_app.git
@@ -76,14 +67,9 @@ flutter test
 
 ---
 
-## API Keys
+## Note on API Keys
 
-This repository is public and contains `firebase_options.dart` which includes Google API keys. These keys are **restricted** at the Google Cloud Console level:
-
-- **Application restrictions** — keys are restricted to this specific app only
-- **API restrictions** — keys are limited to only the Firebase services this app uses
-
-The keys are effectively useless to anyone attempting to use them outside of this application.
+The firebase_options.dart file is included in the repo but the API keys are restricted in Google Cloud Console to only work with this specific app.
 
 ---
 
