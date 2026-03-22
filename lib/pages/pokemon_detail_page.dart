@@ -88,7 +88,7 @@ class _PokemonDetailContent extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           pokemonName[0].toUpperCase() + pokemonName.substring(1),
-          style: TextStyle(
+          style: const TextStyle(
             color: AppColors.pokemonWhite,
             fontWeight: FontWeight.bold,
           ),

@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:pokedex_app/main.dart';
 import 'package:pokedex_app/routes.dart';
 import 'package:pokedex_app/services/auth_services.dart';
 import 'package:pokedex_app/themes.dart';
 import 'package:pokedex_app/validators/validators.dart';
 import 'package:pokedex_app/widgets/custom_text_field.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -48,19 +46,14 @@ class _RegisterPageState extends State<RegisterPage> {
       appBar: AppBar(backgroundColor: AppColors.pokemonRed),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
-        child: ValueListenableBuilder<ThemeMode>(
-          valueListenable: themeNotifier,
-          builder: (context, mode, _) {
-            return Form(
-              key: _formKey,
-              child: Column(
+        child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const SizedBox(height: 40),
                   Icon(
                     Icons.person_add,
                     size: 80,
-                    color: mode == ThemeMode.dark
+                    color: Theme.of(context).brightness == Brightness.dark
                         ? AppColors.pokemonWhite
                         : AppColors.pokemonRed,
                   ),
@@ -122,22 +115,8 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                     ],
                   ),
-                  Switch(
-                    value: themeNotifier.value == ThemeMode.dark,
-                    onChanged: (value) {
-                      themeNotifier.value = value
-                          ? ThemeMode.dark
-                          : ThemeMode.light;
-                      SharedPreferences.getInstance().then(
-                        (prefs) => prefs.setBool('isDark', value),
-                      );
-                    },
-                  ),
                 ],
               ),
-            );
-          },
-        ),
       ),
     );
   }

@@ -8,6 +8,7 @@ import 'package:pokedex_app/cubits/pokemon/pokemon_state.dart';
 import 'package:pokedex_app/pages/pokemon_detail_page.dart';
 import 'package:pokedex_app/repositories/favourite_repository.dart';
 import 'package:pokedex_app/repositories/pokemon_repository.dart';
+import 'package:pokedex_app/routes.dart';
 import 'package:pokedex_app/themes.dart';
 
 class HomePage extends StatelessWidget {
@@ -85,6 +86,12 @@ class _HomePageContentState extends State<_HomePageContent> {
         ),
         backgroundColor: AppColors.pokemonRed,
         automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings, color: AppColors.pokemonWhite),
+            onPressed: () => Navigator.of(context).pushNamed(AppRoutes.settings),
+          )
+        ],
       ),
       body: Column(
         children: [
@@ -139,7 +146,7 @@ class _HomePageContentState extends State<_HomePageContent> {
                 IconButton(
                   icon: Icon(
                     _showFavourites ? Icons.favorite : Icons.favorite_border,
-                    color: _showFavourites ? AppColors.pokemonRed : null,
+                    color: _showFavourites ? AppColors.pokemonRed : AppColors.pokemonWhite,
                   ),
                   onPressed: () {
                     setState(() => _showFavourites = !_showFavourites);
